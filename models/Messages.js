@@ -2,12 +2,12 @@ const mongoose = require('mongoose'); // Fixed typo in `require`
 
 const messageSchema = new mongoose.Schema({
   sender: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to the user sending the message
+    type:String, // Reference to the user sending the message
     ref: 'User',
     required: true,
   },
   receiver: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to the user receiving the message
+    type:String, // Reference to the user receiving the message
     ref: 'User',
     required: true,
   },

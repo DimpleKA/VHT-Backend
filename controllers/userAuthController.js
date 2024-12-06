@@ -64,75 +64,8 @@ const registerUser = async (req, res) => {
 // Controller for registering a user
 const allUsers = async (req, res) => {
     try {
-      const { userId } = req.body;
-  
-      // Validate userId
-      if (!userId) {
-        return res.status(400).json({ message: "userId is required." });
-      }
-  
-      // Fetch all users
-
-  
-      // Fetch messages for the given userId
-      const messages = await Message.aggregate([
-        // Stage 1: Filter messages where userId is either sender or receiver
-        {
-          $match: {
-            $or: [
-              { sender: userId },
-              { receiver: userId }
-            ]
-          }
-        },
-        // Stage 2: Sort messages by timestamp in descending order
-        {
-          $sort: { timestamp: -1 }
-        },
-        // Stage 3: Group by the other user ID
-        {
-          $group: {
-            _id: {
-              otherUser: {
-                $cond: [
-                  { $eq: ["$sender", userId] },
-                  "$receiver",
-                  "$sender"
-                ]
-              }
-            },
-            lastMessage: { $first: "$message" }, // Get the last message content
-            lastMessageTime: { $first: "$timestamp" } // Get the last message timestamp
-          }
-        },
-        // Stage 4: Fetch additional user details using $lookup
-        {
-          $lookup: {
-            from: "users", // Name of the users collection
-            localField: "_id.otherUser", // Field to match in the current collection
-            foreignField: "_id", // Field to match in the users collection
-            as: "userDetails"
-          }
-        },
-        // Stage 5: Reshape the output
-        {
-          $project: {
-            _id: 0,
-            email: { $arrayElemAt: ["$userDetails.email", 0] },
-            name: { $arrayElemAt: ["$userDetails.name", 0] },
-            profileUrl: { $arrayElemAt: ["$userDetails.profileUrl", 0] },
-            lastSeen: { $arrayElemAt: ["$userDetails.lastSeen", 0] },
-            lastMessage: 1,
-            lastMessageTime: 1
-          }
-        }
-      ]);
-  
-      // Send combined response
-      return res.status(200).json({
-        users,
-        messages
-      });
+        const user = await User.find()
+        return res.status(200).json({user });
     } catch (error) {
       console.error("Error fetching data:", error);
       return res.status(500).json({ message: "Internal Server Error" });

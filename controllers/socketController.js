@@ -10,60 +10,58 @@ const socketController = {
     io = socketIo(server, {
       cors: {
         origin: "*", // Allow frontend to access the socket server
-        methods: ["GET", "POST"]
-      }
+        methods: ["GET", "POST"],
+      },
     });
 
-    // When a new user connects, listen for events
+    // Handle user connections
     io.on('connection', (socket) => {
       const userId = socket.handshake.query.userId; // Retrieve userId from the handshake query
-      console.log(`User connected: ${userId}`);
-      console.log('A user connected: ' + socket.id);
+      console.log(`User connected: ${userId} (Socket ID: ${socket.id})`);
 
-      // Find user in the database (assume userId is unique)
+      // Mark user as online and notify others
       User.findOne({ userId })
-        .then(user => {
+        .then((user) => {
           if (user) {
-            // Notify everyone that the user is online
-            io.emit('user_online', { userId: userId, username: user.name });
+            io.emit('user_online', { userId, username: user.name });
           }
         })
-        .catch(err => console.error('Error fetching user:', err));
+        .catch((err) => console.error('Error fetching user:', err));
 
-      // Handle typing events
+      // Listen for typing events
       socket.on('typing', (data) => {
-        socket.broadcast.emit('user_typing', { userId: data.userId });
+        const { from, to } = data; // `from` is the sender, `to` is the intended recipient
+        socket.to(to).emit('user_typing', { from }); // Notify only the recipient
+        console.log(`${from} is typing to ${to}`);
       });
 
-      // Handle message sending
+      // Handle sending messages
       socket.on('send_message', async (message) => {
-        console.log('Message received from client:', message);
-      
+        const { from, to, content } = message;
+
         try {
-          // Save the message to the database
+          // Save message to the database
           const savedMessage = await Message.create({
-            sender: message.from,     // Assuming `message.sender` contains the sender's ID
-            receiver: message.to, // Assuming `message.receiver` contains the receiver's ID
-            content: message.content,   // Assuming `message.content` contains the message content
-            timestamp: new Date(),      // Optional if you want to override default
+            sender: from,
+            receiver: to,
+            content,
+            timestamp: new Date(),
           });
-      
+
           console.log('Message saved to database:', savedMessage);
-      
-          // Broadcast the saved message to all users (or specific users if needed)
-          io.emit('receive_message', savedMessage);
+
+          // Notify the sender and receiver with the new message
+          io.to(socket.id).emit('receive_message', savedMessage); // Notify the sender
+          socket.to(to).emit('receive_message', savedMessage); // Notify the recipient
         } catch (err) {
           console.error('Error saving message:', err);
         }
       });
-      
-      
 
-      // Handle user disconnect
+      // Handle user disconnection
       socket.on('disconnect', () => {
         console.log(`User disconnected: ${userId}`);
-        // Optionally, you can notify that the user has gone offline
-        io.emit('user_offline', { userId: userId });
+        io.emit('user_offline', { userId }); // Notify that the user is offline
       });
     });
   },

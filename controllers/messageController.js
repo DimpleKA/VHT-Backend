@@ -30,19 +30,25 @@ const viewMessage = async (req, res) => {
     const { sender, receiver } = req.body;
 
     try {
+        // Fetch messages where sender/receiver pair matches either direction
         const allMessages = await Message.find({
             $or: [
-                { sender, receiver },
+                { sender: sender, receiver: receiver },
                 { sender: receiver, receiver: sender },
             ],
-        });
+        }).sort({ timestamp: 1 }); // Optional: Sort by timestamp (ascending)
 
-        res.status(200).json({ success: true, messages: allMessages });
+        // Respond with the messages
+        res.status(200).json({ 
+            success: true, 
+            messages: allMessages 
+        });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Internal Server Error",
-            error: error.message,
+        console.error("Error fetching messages:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal Server Error", 
+            error: error.message 
         });
     }
 };

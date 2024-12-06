@@ -11,7 +11,7 @@ const server = http.createServer(app);   // Create HTTP server for socket
 
 // CORS configuration for allowing the frontend to communicate with backend
 const corsOptions = {
-  origin: "http://localhost:5173", // Allow frontend from this origin
+  origin: "*", // Allow frontend from this origin
   methods: ["GET", "POST","PUT","PATCH"],
   allowedHeaders: ["Content-Type"]
 };

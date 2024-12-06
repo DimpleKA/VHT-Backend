@@ -15,9 +15,10 @@ const userSchema = new Schema({
   gender: { type: String, default: null },
   profileImg: { type: String, default: null },
   email: { type: String, required: true, unique: true },
-  mobile: { type: String, unique: true, default: null },
+  mobile: { type: String, unique: true, sparse: true }, // Sparse index
   crushOnYou: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Reference to other users
   location: { type: locationSchema, default: {} }, // Properly define location as a subdocument
+  lastSeen: { type: Date, default: null }, // Add lastSeen field
 });
 
 const User = mongoose.model('User', userSchema); // Create the model

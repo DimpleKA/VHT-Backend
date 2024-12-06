@@ -1,4 +1,5 @@
 const socketIo = require('socket.io');
+const User = require('../models/Users');
 
 let io;
 
@@ -12,26 +13,28 @@ const socketController = {
       }
     });
 
+
     // When a new user connects, listen for events
     io.on('connection', (socket) => {
+        const userId = socket.handshake.query.userId; // Retrieve userId from the handshake query
+  console.log(`User connected: ${userId}`);
       console.log('A user connected: ' + socket.id);
 
       // Handle sending a message
-      socket.on('send_message', (message) => {
-        console.log('Message received: ', message);
-        // Emit the message to the intended recipient
-        io.to(message.receiverId).emit('receive_message', message);
-      });
+      // Handle typing events
+  socket.on('typing', (data) => {
+    socket.broadcast.emit('user_typing', { userId: data.userId });
+  });
 
-      // Listen for typing events
-      socket.on('typing', (data) => {
-        socket.broadcast.emit('user_typing', data);  // Broadcast typing status to others
-      });
+  // Handle message sending
+  socket.on('send_message', (message) => {
+    io.emit('receive_message', message); // Broadcast the message to all users
+  });
 
-      // Handle disconnect
-      socket.on('disconnect', () => {
-        console.log('User disconnected: ' + socket.id);
-      });
+  socket.on('disconnect', () => {
+    console.log(`User disconnected: ${userId}`);
+  });
+
     });
   },
 };

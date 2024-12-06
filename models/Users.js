@@ -15,7 +15,7 @@ const userSchema = new Schema({
   gender: { type: String },
   profileImg: { type: String, required: false },
   email: { type: String, required: true, unique: true },
-  mobile: { type: String, required: true, unique: true },
+  mobile: { type: String,  unique: true },
   crushOnYou: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Reference to other users
   location: { type: locationSchema } // Properly define location as a subdocument
 });

@@ -6,8 +6,6 @@ const User = require('../models/Users')
 // @route - POST api/user/registerUser
 // @access - PUBLIC
 const registerUser = async (req, res) =>{
-    console.log(req.body);
-    return res.status(200).json({message:"khkjhk"})
 try{
     const { given_name,family_name, name, picture, email, } =req.body;
     
@@ -32,7 +30,7 @@ try{
       });
 
       await newUser.save();
-
+   
       return res.status(201).json({
         message: 'User registered successfully',
         userId,

@@ -11,7 +11,7 @@ try{
     
 
     const documentCount = await User.countDocuments();
-    const userId = `${email.split('@')[0]}-${documentNumber+1}`;
+    const userId = `${email.split('@')[0]}-${documentCount+1}`;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {

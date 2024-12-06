@@ -59,9 +59,18 @@ const socketController = {
       });
 
       // Handle user disconnection
-      socket.on('disconnect', () => {
+      socket.on('disconnect', async () => {
         console.log(`User disconnected: ${userId}`);
         io.emit('user_offline', { userId }); // Notify that the user is offline
+        try {
+          await User.findOneAndUpdate(
+            { userId },
+            { $set: { lastSeen: new Date() } } // Update the lastSeen timestamp
+          );
+          console.log(`Updated lastSeen for user: ${userId}`);
+        } catch (err) {
+          console.error('Error updating lastSeen:', err);
+        }
       });
     });
   },

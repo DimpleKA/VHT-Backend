@@ -8,7 +8,7 @@ const { jwtEncode } = require('../middlewares/jwt'); // Import the jwtEncode fun
 // Controller for registering a user
 const registerUser = async (req, res) => {
   try {
-    const { given_name, family_name, name, picture, email, age, gender, mobile, location } = req.body;
+    const { given_name, family_name, name, picture, email, age, gender,  location } = req.body;
 
     // Generate a unique userId
     const documentCount = await User.countDocuments();
@@ -28,7 +28,6 @@ const registerUser = async (req, res) => {
       gender: gender || null, // Default to null if gender is not provided
       profileImg: picture || null, // Default to null if picture is not provided
       email,
-      mobile: mobile || null, // Default to null if mobile is not provided
       location: location || { latitude: null, longitude: null }, // Default to an empty location object
     });
 
@@ -61,10 +60,12 @@ const registerUser = async (req, res) => {
 // @desc - list of all users
 // @route - POST api/user/allUsers
 // @access - PRIVATE
+
 // Controller for registering a user
 const allUsers = async (req, res) => {
+
     try {
-        const user = await User.find()
+        const user = await User.find();
         return res.status(200).json({user });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -72,6 +73,54 @@ const allUsers = async (req, res) => {
     }
   };
   
+
+
+
+
+  // const allUsers = async (req, res) => {
+  //   const { loggedInUser } = req.body;
+  
+  //   try {
+  //     // Fetch all users except the logged-in user
+  //     const users = await User.find({ userId: { $ne: loggedInUser } });
+  
+  //     // Fetch last messages for each user concurrently
+  //     const usersWithMessages = await Promise.all(
+  //       users.map(async (user) => {
+  //         try {
+  //           // Fetch the last message exchanged between loggedInUser and the current user
+  //           const lastMessage = await Message.findOne({
+  //             $or: [
+  //               { sender: loggedInUser, receiver: user.userId },
+  //               { sender: user.userId, receiver: loggedInUser },
+  //             ],
+  //           })
+  //             .sort({ timestamp: -1 }) // Sort by the latest timestamp
+  //             .select("content timestamp");
+  
+  //           return {
+  //             ...user.toObject(), // Convert Mongoose document to plain object
+  //             lastMessage: lastMessage ? lastMessage.content : "No message found",
+  //           };
+  //         } catch (err) {
+  //           console.error(`Error fetching last message for user ${user.userId}:`, err);
+  //           return {
+  //             ...user.toObject(),
+  //             lastMessage: "No message found",
+  //           };
+  //         }
+  //       })
+  //     );
+  
+  //     return res.status(200).json(usersWithMessages);
+  //   } catch (error) {
+  //     console.error("Error fetching users or messages:", error);
+  //     return res.status(500).json({ message: "Internal Server Error" });
+  //   }
+  // };
+  
+
+
 
 
 module.exports = {

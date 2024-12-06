@@ -15,7 +15,7 @@ const userSchema = new Schema({
   gender: { type: String, default: null },
   profileImg: { type: String, default: null },
   email: { type: String, required: true, unique: true },
-  mobile: { type: String, unique: true, sparse: true, default: null }, // Ensure default is null but sparse index
+  mobile: { type: String, default: null }, // Ensure default is null but sparse index
   crushOnYou: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   location: { type: locationSchema, default: {} },
   lastSeen: { type: Date, default: null },

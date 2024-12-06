@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {registerUser} = require('../controllers/userAuthController')
+const {registerUser, allUsers} = require('../controllers/userAuthController')
 
 
 
 router.post('/registerUser', registerUser);   // http://localhost:3000/api/users/registerUser
+
+router.post('/allUsers', allUsers);   // http://localhost:3000/api/users/allUsers
 
 
 

@@ -12,7 +12,7 @@ const registerUser = async (req, res) => {
   
       // Generate a unique userId
       const documentCount = await User.countDocuments();
-      const userId = `${email.split('@')[0]}-${documentCount + 1}`;
+      const userId = `${email.split('@')[0]}${documentCount + 1}`;
   
       // Check if the user already exists
       const existingUser = await User.findOne({ email });

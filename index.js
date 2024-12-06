@@ -28,7 +28,7 @@ app.use(express.json());
 app.use("/api/users/", userRoutes);
 
 // Connect to the database (Uncomment to use)
-const URI = process.env.MONGO_URI || "mongodb+srv://vatsal00:Dimple9@cluster0.cvuh3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const URI = process.env.MONGO_URI || "mongodb+srv://vatsal00:Dimple9@cluster0.cvuh3.mongodb.net/Vht?retryWrites=true&w=majority&appName=Cluster0";
 connectDB(URI);
 
 // Start the server

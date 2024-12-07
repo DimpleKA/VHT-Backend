@@ -8,7 +8,11 @@ const { jwtEncode } = require('../middlewares/jwt'); // Import the jwtEncode fun
 // Controller for registering a user
 const registerUser = async (req, res) => {
   try {
-    const { given_name, family_name, name, picture, email, age, gender,  location } = req.body;
+    const { given_name, family_name, name, picture, email, age, gender, location } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required for registration' });
+    }
 
     // Generate a unique userId
     const documentCount = await User.countDocuments();
@@ -17,32 +21,30 @@ const registerUser = async (req, res) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-  
-
       const token = await jwtEncode({
         userId: existingUser.userId,
         email: existingUser.email,
         name: existingUser.name,
         profileImg: existingUser.profileImg,
       });
-  
+
       // Respond with success and include the JWT token
-      return res.status(201).json({
-        message: 'User registered successfully',
-        userId: newUser.userId,
+      return res.status(200).json({
+        message: 'User already registered',
+        userId: existingUser.userId,
         token, // Send JWT token
       });
     }
 
     // Create a new user
     const newUser = new User({
-      name: name || `${given_name} ${family_name}`, // Use given_name and family_name if name is not provided
+      name: name || `${given_name || ''} ${family_name || ''}`.trim(),
       userId,
-      age: age || null, // Default to null if age is not provided
-      gender: gender || null, // Default to null if gender is not provided
-      profileImg: picture || null, // Default to null if picture is not provided
+      age: age || null,
+      gender: gender || null,
+      profileImg: picture || null,
       email,
-      location: location || { latitude: null, longitude: null }, // Default to an empty location object
+      location: location || { latitude: null, longitude: null },
     });
 
     // Save the user to the database
@@ -60,14 +62,14 @@ const registerUser = async (req, res) => {
     return res.status(201).json({
       message: 'User registered successfully',
       userId: newUser.userId,
-      token, // Send JWT token
+      token,
     });
-
   } catch (error) {
-    console.error('Error registering user:', error);
+    console.error('Error registering user:', error.message || error);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 
 
 

@@ -17,7 +17,21 @@ const registerUser = async (req, res) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already registered' });
+  
+
+      const token = await jwtEncode({
+        userId: existingUser.userId,
+        email: existingUser.email,
+        name: existingUser.name,
+        profileImg: existingUser.profileImg,
+      });
+  
+      // Respond with success and include the JWT token
+      return res.status(201).json({
+        message: 'User registered successfully',
+        userId: newUser.userId,
+        token, // Send JWT token
+      });
     }
 
     // Create a new user

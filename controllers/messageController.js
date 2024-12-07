@@ -27,6 +27,7 @@ const sendMessage = async(req,res)=>{
 //@route - api/users/viewMessage
 //@access - PRIVATE
 const viewMessage = async (req, res) => {
+    console.log(req.body)
     const { sender, receiver } = req.body;
 
     try {
